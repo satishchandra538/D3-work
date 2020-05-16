@@ -11,6 +11,12 @@
             overflow: hidden;
         }
 
+        .line {
+            fill: none;
+            stroke-width: 4px;
+            mix-blend-mode: overlay;
+        }
+
         .line-path {
             fill: none;
             stroke: maroon;
@@ -40,16 +46,16 @@
             font-size: 2.5em;
             fill: #635F5D;
         }
-        circle{
-            opacity: 0.5;
-            color:rgb(192, 118, 7);
+
+        .headings {
+            fill: rgb(141, 141, 141)
         }
     </style>
 </head>
 
 <body>
     <script src="https://d3js.org/d3.v5.min.js"></script>
-    <script src="./line.js"></script>
+    <script src="./modifiedline.js"></script>
 </body>
 
 </html>
