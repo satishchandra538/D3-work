@@ -39,14 +39,12 @@ const getLineData = (covidData) => {
     })
     finalData.forEach(country => {
         for (let i = country.datapoints.length;i>=0;i--){
-            //.log(country.datapoints[i].value)
             if(i!==country.datapoints.length && i!==0){
                 country.datapoints[i].value = country.datapoints[i].value - country.datapoints[i - 1].value;
-                console.log(country.datapoints[i].value,i)
             }
         }
     })
-    return finalData
+    return finalData;
 }
 
 d3.csv('./covid-19_may.csv').then(countries => {
@@ -77,9 +75,9 @@ d3.csv('./covid-19_may.csv').then(countries => {
     for (let i = 0; i < covidData.length; i++) {
         covidData[i].country.splice(10);
     }
-
+    
     const yScale = d3.scaleLinear()
-        .domain([0, 100000])
+        .domain([0, 90000])
         .range([innerHeight, 0])
 
     const xScale = d3.scaleTime()
@@ -101,6 +99,16 @@ d3.csv('./covid-19_may.csv').then(countries => {
         .y(d => yScale(d["value"]))
 
     var lineData = getLineData(covidData);
+    //find max for y axis
+    // lineData.forEach(country => {
+    //     for (let i = country.datapoints.length; i >= 0; i--) {
+    //         // if (i !== country.datapoints.length && i !== 0) {
+    //         //     country.datapoints[i].value = country.datapoints[i].value - country.datapoints[i - 1].value;
+    //         // }
+    //         console.log(country.datapoints[i])
+    //     }
+    // })
+    // console.log(maximumIncrease)
     
     var country = g.selectAll(".country")
         .data(lineData)
