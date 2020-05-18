@@ -6,7 +6,7 @@ const xAxisLabel = 'Date';
 const yValue = d => d.country;
 const yAxisLabel = 'Number of Patients';
 
-const margin = { top: 60, right: 40, bottom: 70, left: 100 };
+const margin = { top: 60, right: 150, bottom: 70, left: 100 };
 const innerWidth = width - margin.left - margin.right;
 const innerHeight = height - margin.top - margin.bottom;
 
@@ -37,6 +37,15 @@ const getLineData = (covidData) => {
             })
         })
     })
+    finalData.forEach(country => {
+        for (let i = country.datapoints.length;i>=0;i--){
+            //.log(country.datapoints[i].value)
+            if(i!==country.datapoints.length && i!==0){
+                country.datapoints[i].value = country.datapoints[i].value - country.datapoints[i - 1].value;
+                console.log(country.datapoints[i].value,i)
+            }
+        }
+    })
     return finalData
 }
 
@@ -47,11 +56,10 @@ d3.csv('./covid-19_may.csv').then(countries => {
     countries.forEach(country => {
         let obj = { date: "", country: [] };
         Object.keys(country).forEach((day, index) => {
-            if (day !== 'date' && day !== 'World') {
+            if (day !== 'date' && day !== 'World' && day !== 'International') {
                 let countryData = {};
                 countryData.name = day;
                 countryData.number = +country[day];
-                countryData.date = country.date;
                 obj.country.push(countryData);
             }
         })
@@ -70,41 +78,37 @@ d3.csv('./covid-19_may.csv').then(countries => {
         covidData[i].country.splice(10);
     }
 
-    const xAxisTitle = []
-
     const yScale = d3.scaleLinear()
-        .domain([0, covidData[covidData.length - 1].country[0].number])
+        .domain([0, 100000])
         .range([innerHeight, 0])
 
-    var xScale = d3.scaleTime()
-        .domain([d3.min(covidData, d => parseDate(d.date)), d3.max(covidData, d => parseDate(d.date))])
+    const xScale = d3.scaleTime()
+        .domain(d3.extent(covidData, d => parseDate(d.date)))
         .range([0, innerWidth])
-
-    // Define lines
-    var line = d3
-        .line()
-        .curve(d3.curveMonotoneX)
-        .x(d => xScale(parseDate(d["date"])))
-        .y(d => yScale(d["value"]))
 
     var color = d3.scaleOrdinal().range(d3.schemeCategory10);
 
     const g = svg.append('g').attr('transform', `translate(${margin.left}, ${margin.top})`);
-    g.append('g').call(d3.axisLeft(yScale))
-    g.append('g').call(d3.axisBottom(xScale).ticks(Math.max(width / 75, 5)))
+    const yAxis = g.append('g').call(d3.axisLeft(yScale))
+    const xAxis = g.append('g').call(d3.axisBottom(xScale).ticks(Math.max(width / 75, 5)))
         .attr('transform', `translate(${0},${innerHeight})`)
         .attr('class', 'bottomtick')
 
+    // Define lines
+    const line = d3.line()
+        .curve(d3.curveMonotoneX)
+        .x(d => xScale(parseDate(d["date"])))
+        .y(d => yScale(d["value"]))
+
     var lineData = getLineData(covidData);
-    console.log(lineData)
+    
     var country = g.selectAll(".country")
         .data(lineData)
         .enter()
         .append("g")
         .attr("class", d => "country " + d.country);
 
-    country
-        .append("path")
+    country.append("path")
         .attr("class", "line")
         .attr("d", d => line(d.datapoints))
         .style("stroke", d => color(d.country))
@@ -119,28 +123,31 @@ d3.csv('./covid-19_may.csv').then(countries => {
     var color = d3.scaleOrdinal()
         .domain(keys)
         .range(d3.schemeSet2);
-
     // Add one dot in the legend for each name.
-    g.selectAll("mydots")
+    const Legends = svg.append('g')
+        .attr('transform',`translate(${innerWidth+10},${20})`);
+    Legends.selectAll("mydots")
         .data(keys)
         .enter()
         .append("circle")
         .attr("cx", 110)
         .attr("cy", (d, i) => i * 25 - 5)
-        .attr("r", 5)
+        .attr("r", 3)
         .style("fill", d => color(d))
 
     // Add one dot in the legend for each name.
-    g.selectAll("mylabels")
+    Legends.selectAll("mylabels")
         .data(keys)
         .enter()
         .append("text")
         .attr("x", 120)
         .attr("y", (d, i) => i * 25)
         .style("fill", d => color(d))
+        .style('font-size','12px')
         .text(d => d)
         .attr("text-anchor", "left")
         .style("alignment-baseline", "middle")
+
 
     //adding headings ---------------------
     g.append('text')
