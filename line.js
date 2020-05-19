@@ -1,16 +1,14 @@
-const height = 600, width = 1200;
+const width = window.innerWidth,height = width/2 -15;
 const title = 'Top 10 Countries for Each Day'
 const xValue = d => d.date;
 const xAxisLabel = 'Date';
-
+console.log(height,width)
 const yValue = d => d.country;
 const yAxisLabel = 'Number of Patients';
 
 const margin = { top: 60, right: 150, bottom: 70, left: 100 };
 const innerWidth = width - margin.left - margin.right;
 const innerHeight = height - margin.top - margin.bottom;
-
-// Define date parser
 
 const svg = d3.select('body')
     .append('svg')
@@ -20,15 +18,16 @@ const svg = d3.select('body')
 var parseDate = d3.timeParse("%Y/%m/%d");
 const getLineData = (covidData) => {
     let data = {}, finalData = [];
-    covidData.forEach(e => {
-        e.country.forEach(c => {
-            if (!data[c.name]) { data[c.name] = [] }
-            data[c.name].push({
-                "date": e.date,
-                "value": c.number
+    covidData.forEach(date => {
+        date.country.forEach(countryMember => {
+            if (!data[countryMember.name]) { data[countryMember.name] = [] }
+            data[countryMember.name].push({
+                "date": date.date,
+                "value": countryMember.number
             })
         })
     })
+
     Object.keys(data).forEach(name => {
         finalData.push({
             "country": name,
@@ -38,8 +37,8 @@ const getLineData = (covidData) => {
         })
     })
     finalData.forEach(country => {
-        for (let i = country.datapoints.length;i>=0;i--){
-            if(i!==country.datapoints.length && i!==0){
+        for (let i = country.datapoints.length; i >= 0; i--) {
+            if (i !== country.datapoints.length && i !== 0) {
                 country.datapoints[i].value = country.datapoints[i].value - country.datapoints[i - 1].value;
             }
         }
@@ -48,9 +47,7 @@ const getLineData = (covidData) => {
 }
 
 d3.csv('./covid-19_may.csv').then(countries => {
-
     const covidData = [];
-
     countries.forEach(country => {
         let obj = { date: "", country: [] };
         Object.keys(country).forEach((day, index) => {
@@ -88,7 +85,7 @@ d3.csv('./covid-19_may.csv').then(countries => {
 
     const g = svg.append('g').attr('transform', `translate(${margin.left}, ${margin.top})`);
     const yAxis = g.append('g').call(d3.axisLeft(yScale))
-    const xAxis = g.append('g').call(d3.axisBottom(xScale).ticks(Math.max(width / 75, 5)))
+    const xAxis = g.append('g').call(d3.axisBottom(xScale).ticks(Math.max(width / 175, 5)))
         .attr('transform', `translate(${0},${innerHeight})`)
         .attr('class', 'bottomtick')
 
@@ -100,16 +97,8 @@ d3.csv('./covid-19_may.csv').then(countries => {
 
     var lineData = getLineData(covidData);
     //find max for y axis
-    // lineData.forEach(country => {
-    //     for (let i = country.datapoints.length; i >= 0; i--) {
-    //         // if (i !== country.datapoints.length && i !== 0) {
-    //         //     country.datapoints[i].value = country.datapoints[i].value - country.datapoints[i - 1].value;
-    //         // }
-    //         console.log(country.datapoints[i])
-    //     }
-    // })
-    // console.log(maximumIncrease)
-    
+
+    console.log("lineData",lineData)
     var country = g.selectAll(".country")
         .data(lineData)
         .enter()
@@ -127,10 +116,6 @@ d3.csv('./covid-19_may.csv').then(countries => {
         keys.push(country.country)
     })
 
-    // Usually you have a color scale in your chart already
-    var color = d3.scaleOrdinal()
-        .domain(keys)
-        .range(d3.schemeSet2);
     // Add one dot in the legend for each name.
     const Legends = svg.append('g')
         .attr('transform',`translate(${innerWidth+10},${20})`);
