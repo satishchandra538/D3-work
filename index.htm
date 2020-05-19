@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Multigraph Using D3</title>
     <style>
         body {
             margin: 0;
@@ -15,32 +15,40 @@
             fill: none;
             stroke-width: 2px;
         }
-
+        .tick text{
+            color:gray;
+        }
         text {
             font-family: sans-serif;
         }
 
-        .tick text {
-            font-size: 1.2em;
-            fill: #635F5D;
-        }
-
-        .tick line {
-            stroke: #C0C0BB;
-        }
-
-        .axis-label {
-            font-size: 2em;
-            fill: #8E8883;
-        }
-
-        .title {
-            font-size: 2.5em;
-            fill: #635F5D;
-        }
-
         .headings {
-            fill: rgb(141, 141, 141)
+            fill: rgb(141, 141, 141);
+            font-size: 28px;
+        }
+        @media (max-width:768px){
+            .tick text {
+            font-size: 0.9em;
+            }
+            .headings{
+                font-size: 16px;
+            }
+        }
+        @media (max-width:450px){
+            .tick text {
+            font-size: 0.8em;
+            }
+            .headings{
+                font-size: 12px;
+            }
+        }
+        @media (max-width:400px){
+            .tick text {
+                font-size: 0.9em;
+            }
+            .headings{
+                display: none;
+            }
         }
     </style>
 </head>

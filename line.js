@@ -76,16 +76,18 @@ d3.csv('./covid-19_may.csv').then(countries => {
     const yScale = d3.scaleLinear()
         .domain([0, 90000])
         .range([innerHeight, 0])
+        .nice()
 
     const xScale = d3.scaleTime()
         .domain(d3.extent(covidData, d => parseDate(d.date)))
         .range([0, innerWidth])
+        .nice()
 
     var color = d3.scaleOrdinal().range(d3.schemeCategory10);
 
     const g = svg.append('g').attr('transform', `translate(${margin.left}, ${margin.top})`);
-    const yAxis = g.append('g').call(d3.axisLeft(yScale))
-    const xAxis = g.append('g').call(d3.axisBottom(xScale).ticks(Math.max(width / 175, 5)))
+    g.append('g').call(d3.axisLeft(yScale))
+    g.append('g').call(d3.axisBottom(xScale).ticks(Math.max(width / 175, 5)))
         .attr('transform', `translate(${0},${innerHeight})`)
         .attr('class', 'bottomtick')
 
@@ -96,7 +98,6 @@ d3.csv('./covid-19_may.csv').then(countries => {
         .y(d => yScale(d["value"]))
 
     var lineData = getLineData(covidData);
-    //find max for y axis
 
     console.log("lineData",lineData)
     var country = g.selectAll(".country")
@@ -119,7 +120,7 @@ d3.csv('./covid-19_may.csv').then(countries => {
     // Add one dot in the legend for each name.
     const Legends = svg.append('g')
         .attr('transform',`translate(${innerWidth+10},${20})`);
-    Legends.selectAll("mydots")
+    Legends.selectAll("dots")
         .data(keys)
         .enter()
         .append("circle")
@@ -129,7 +130,7 @@ d3.csv('./covid-19_may.csv').then(countries => {
         .style("fill", d => color(d))
 
     // Add one dot in the legend for each name.
-    Legends.selectAll("mylabels")
+    Legends.selectAll("labels")
         .data(keys)
         .enter()
         .append("text")
@@ -144,22 +145,19 @@ d3.csv('./covid-19_may.csv').then(countries => {
 
     //adding headings ---------------------
     g.append('text')
-        .attr('x', innerWidth / 2 - margin.left - margin.right)
+        .attr('x', innerWidth / 2 - 110)
         .attr('y', -10)
         .attr('class', 'headings')
-        .style('font-size', '28px')
         .html(title)
     g.append('text')
         .attr('x', innerWidth / 2)
         .attr('y', innerHeight + 50)
         .attr('class', 'headings')
-        .style('font-size', '28px')
         .html(xAxisLabel)
     g.append('text')
-        .attr('x', -innerHeight / 2 - 110)
-        .attr('y', 0 - 70)
+        .attr('x', -innerHeight/2-70)
+        .attr('y', -70)
         .attr('class', 'headings')
         .attr('transform', 'rotate(-90)')
-        .style('font-size', '28px')
         .html(yAxisLabel)
 });
