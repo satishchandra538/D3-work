@@ -1,8 +1,7 @@
-const width = window.innerWidth,height = width/2 -15;
+const width = window.innerWidth, height = width / 2 - 20;
 const title = 'Top 10 Countries for Each Day'
 const xValue = d => d.date;
 const xAxisLabel = 'Date';
-console.log(height,width)
 const yValue = d => d.country;
 const yAxisLabel = 'Number of Patients';
 
@@ -10,7 +9,7 @@ const margin = { top: 60, right: 150, bottom: 70, left: 100 };
 const innerWidth = width - margin.left - margin.right;
 const innerHeight = height - margin.top - margin.bottom;
 
-const svg = d3.select('body')
+const svg = d3.select('#multiGraph')
     .append('svg')
     .attr('width', width)
     .attr('height', height)
@@ -39,7 +38,7 @@ const getLineData = (covidData) => {
     finalData.forEach(country => {
         for (let i = country.datapoints.length; i >= 0; i--) {
             if (i !== country.datapoints.length && i !== 0) {
-                country.datapoints[i].value = country.datapoints[i].value - country.datapoints[i - 1].value;
+                country.datapoints[i].value -= country.datapoints[i - 1].value;
             }
         }
     })
@@ -72,7 +71,7 @@ d3.csv('./covid-19_may.csv').then(countries => {
     for (let i = 0; i < covidData.length; i++) {
         covidData[i].country.splice(10);
     }
-    
+
     const yScale = d3.scaleLinear()
         .domain([0, 90000])
         .range([innerHeight, 0])
@@ -85,7 +84,8 @@ d3.csv('./covid-19_may.csv').then(countries => {
 
     var color = d3.scaleOrdinal().range(d3.schemeCategory10);
 
-    const g = svg.append('g').attr('transform', `translate(${margin.left}, ${margin.top})`);
+    const g = svg.append('g').attr('transform', `translate(${margin.left}, ${margin.top})`)
+
     g.append('g').call(d3.axisLeft(yScale))
     g.append('g').call(d3.axisBottom(xScale).ticks(Math.max(width / 175, 5)))
         .attr('transform', `translate(${0},${innerHeight})`)
@@ -99,7 +99,6 @@ d3.csv('./covid-19_may.csv').then(countries => {
 
     var lineData = getLineData(covidData);
 
-    console.log("lineData",lineData)
     var country = g.selectAll(".country")
         .data(lineData)
         .enter()
@@ -118,29 +117,50 @@ d3.csv('./covid-19_may.csv').then(countries => {
     })
 
     // Add one dot in the legend for each name.
-    const Legends = svg.append('g')
-        .attr('transform',`translate(${innerWidth+10},${20})`);
-    Legends.selectAll("dots")
+
+    let legendWidth = 0,legendMargin=-60, n = keys.length / 4;
+
+    const LegendsGroup = d3.select("#legends").append("svg")
+                        .attr("width",width)
+                        .attr("height",200)
+                        .attr('transform', `translate(${legendMargin},${0})`);
+
+    const Legends = LegendsGroup.selectAll(".legends")
         .data(keys)
         .enter()
-        .append("circle")
+        .append("g")
+        .attr("class","legends")
+        .attr("transform",(d,i)=>{
+            return `translate(${Math.floor(i % n)*120},${Math.floor(i / n)*15+10})`
+        })
+    Legends.append("circle")
         .attr("cx", 110)
-        .attr("cy", (d, i) => i * 25 - 5)
-        .attr("r", 3)
+        .attr("cy", 0)
+        .attr("r", 2.5)
         .style("fill", d => color(d))
 
     // Add one dot in the legend for each name.
-    Legends.selectAll("labels")
-        .data(keys)
-        .enter()
-        .append("text")
+    Legends.append("text")
         .attr("x", 120)
-        .attr("y", (d, i) => i * 25)
+        .attr("y", 5)
         .style("fill", d => color(d))
-        .style('font-size','12px')
         .text(d => d)
         .attr("text-anchor", "left")
         .style("alignment-baseline", "middle")
+        .on("mouseover", (d) => {
+            const thisCountry = document.getElementsByClassName(d)[0];
+            const otherCountry = document.getElementsByClassName('country');
+            for (let i = 0; i < otherCountry.length; i++) {
+                otherCountry[i].style.opacity = 0.1;
+            }
+            thisCountry.style.opacity = 1;
+        })
+        .on("mouseout", () => {
+            const otherCountry = document.getElementsByClassName('country');
+            for (let i = 0; i < otherCountry.length; i++) {
+                otherCountry[i].style.opacity = 1;
+            }
+        })
 
 
     //adding headings ---------------------
@@ -155,7 +175,7 @@ d3.csv('./covid-19_may.csv').then(countries => {
         .attr('class', 'headings')
         .html(xAxisLabel)
     g.append('text')
-        .attr('x', -innerHeight/2-70)
+        .attr('x', -innerHeight / 2 - 70)
         .attr('y', -70)
         .attr('class', 'headings')
         .attr('transform', 'rotate(-90)')

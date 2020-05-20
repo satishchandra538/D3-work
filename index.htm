@@ -8,45 +8,60 @@
     <style>
         body {
             margin: 0;
-            overflow: hidden;
+            padding: 0;
+            box-sizing: border-box;
+            overflow-x: hidden;
         }
 
         .line {
             fill: none;
             stroke-width: 2px;
         }
-        .tick text{
-            color:gray;
+
+        .tick text {
+            color: gray;
         }
+
         text {
             font-family: sans-serif;
+            font-size: 14px;
+        }
+
+        .country {
+            transition: 0.6s;
         }
 
         .headings {
             fill: rgb(141, 141, 141);
             font-size: 28px;
         }
-        @media (max-width:768px){
-            .tick text {
-            font-size: 0.9em;
-            }
-            .headings{
-                font-size: 16px;
-            }
-        }
-        @media (max-width:450px){
-            .tick text {
-            font-size: 0.8em;
-            }
-            .headings{
-                font-size: 12px;
-            }
-        }
-        @media (max-width:400px){
+
+        @media (max-width:768px) {
             .tick text {
                 font-size: 0.9em;
             }
-            .headings{
+
+            .headings {
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width:450px) {
+            .tick text {
+                font-size: 0.8em;
+            }
+
+            .headings {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width:400px) {
+            .tick text {
+                font-size: 0.9em;
+            }
+
+            .headings {
                 display: none;
             }
         }
@@ -54,6 +69,7 @@
 </head>
 
 <body>
+    <div id="multiGraph"></div>
     <div id="legends"></div>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="./line.js"></script>
