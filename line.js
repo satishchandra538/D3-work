@@ -1,11 +1,11 @@
-const width = window.innerWidth, height = width / 2 - 20;
+const width = window.innerWidth, height = width / 2 - 60;
 const title = 'Top 10 Countries for Each Day'
 const xValue = d => d.date;
 const xAxisLabel = 'Date';
 const yValue = d => d.country;
 const yAxisLabel = 'Number of Patients';
 
-const margin = { top: 60, right: 150, bottom: 70, left: 100 };
+const margin = { top: 32, right: 20, bottom: 50, left: 100 };
 const innerWidth = width - margin.left - margin.right;
 const innerHeight = height - margin.top - margin.bottom;
 
@@ -84,7 +84,8 @@ d3.csv('./covid-19_may.csv').then(countries => {
 
     var color = d3.scaleOrdinal().range(d3.schemeCategory10);
 
-    const g = svg.append('g').attr('transform', `translate(${margin.left}, ${margin.top})`)
+    // const g = svg.append('g').attr('transform', `translate(${margin.left}, ${margin.top})`)
+    const g = svg.append('g').attr('transform', `translate(${margin.left-10}, ${margin.top})`)
 
     g.append('g').call(d3.axisLeft(yScale))
     g.append('g').call(d3.axisBottom(xScale).ticks(Math.max(width / 175, 5)))
@@ -118,12 +119,13 @@ d3.csv('./covid-19_may.csv').then(countries => {
 
     // Add one dot in the legend for each name.
 
-    let legendWidth = 0,legendMargin=-60, n = keys.length / 4;
-
+    let legendWidth = 120, legendHeight = 30,legendLeftMargin=-100, n = keys.length / 4;
+    let size = Math.floor(width / legendWidth);
+    let yOfLegend = 0,xOfLegend=0;
     const LegendsGroup = d3.select("#legends").append("svg")
-                        .attr("width",width)
-                        .attr("height",200)
-                        .attr('transform', `translate(${legendMargin},${0})`);
+                        .attr("width",width+50)
+                        .attr("height",500)
+                        .attr('transform', `translate(${legendLeftMargin},${0})`);
 
     const Legends = LegendsGroup.selectAll(".legends")
         .data(keys)
@@ -131,7 +133,10 @@ d3.csv('./covid-19_may.csv').then(countries => {
         .append("g")
         .attr("class","legends")
         .attr("transform",(d,i)=>{
-            return `translate(${Math.floor(i % n)*120},${Math.floor(i / n)*15+10})`
+            if(i%size===0){xOfLegend=0}else{xOfLegend+=legendWidth};
+            if(i%size===1){yOfLegend+=legendHeight}
+            console.log(i%size,xOfLegend,yOfLegend,d)
+            return `translate(${xOfLegend},${yOfLegend})`
         })
     Legends.append("circle")
         .attr("cx", 110)
@@ -181,3 +186,9 @@ d3.csv('./covid-19_may.csv').then(countries => {
         .attr('transform', 'rotate(-90)')
         .html(yAxisLabel)
 });
+
+//adding zoom behaviour
+
+// var zoom = d3.zoom();
+// console.log(zoom);
+// g.call(zoom.on("zoom",zoomed))
